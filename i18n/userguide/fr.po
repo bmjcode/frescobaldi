@@ -9203,7 +9203,7 @@ msgstr ""
 #~ msgstr "Indiquez le nombre de voix distinctes prévues par portée."
 
 #~ msgid ""
-#~ "This is primarily useful when you write polyphonic music like a fuge."
+#~ "This is primarily useful when you write polyphonic music like a fugue."
 #~ msgstr "C'est surtout utile dans de la musique polyphonique (fugue, …)."
 
 #~ msgid "Right hand:"

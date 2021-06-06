@@ -7392,7 +7392,7 @@ msgstr ""
 #~ msgstr "Количество голосов на каждом нотном стане."
 
 #~ msgid ""
-#~ "This is primarily useful when you write polyphonic music like a fuge."
+#~ "This is primarily useful when you write polyphonic music like a fugue."
 #~ msgstr "В основном, полезно при наборе полифонической музыки."
 
 #~ msgid "Right hand:"

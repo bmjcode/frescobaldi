@@ -8599,7 +8599,7 @@ msgstr ""
 #~ msgstr "Passen Sie die Anzahl separater Stimmen pro Zeile an."
 
 #~ msgid ""
-#~ "This is primarily useful when you write polyphonic music like a fuge."
+#~ "This is primarily useful when you write polyphonic music like a fugue."
 #~ msgstr ""
 #~ "Das ist vor allem dann nützlich, wenn Sie polyphone Musik schreiben, "
 #~ "wiez. B. eine Fuge."

@@ -6986,7 +6986,7 @@ msgstr ""
 #~ "Ajustar a forma como muitas vozes distintas que deseja em cada pauta"
 
 #~ msgid ""
-#~ "This is primarily useful when you write polyphonic music like a fuge."
+#~ "This is primarily useful when you write polyphonic music like a fugue."
 #~ msgstr ""
 #~ "Isso é útil principalmente quando você escreve música polifônica como uma "
 #~ "Fuga."

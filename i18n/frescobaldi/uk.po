@@ -5812,7 +5812,7 @@ msgid "Adjust how many separate voices you want on each staff."
 msgstr ""
 
 #: ../../frescobaldi_app/scorewiz/parts/_base.py:137
-msgid "This is primarily useful when you write polyphonic music like a fuge."
+msgid "This is primarily useful when you write polyphonic music like a fugue."
 msgstr ""
 
 #: ../../frescobaldi_app/scorewiz/parts/_base.py:139

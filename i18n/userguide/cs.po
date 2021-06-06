@@ -9230,7 +9230,7 @@ msgstr ""
 #~ msgstr "Nastavit, kolik oddělených hlasů chcete mít na každé notové osnově."
 
 #~ msgid ""
-#~ "This is primarily useful when you write polyphonic music like a fuge."
+#~ "This is primarily useful when you write polyphonic music like a fugue."
 #~ msgstr ""
 #~ "Toto je užitečné zejména, když píšete polyfonní hudbu, jakou je fuga."
 

@@ -6890,7 +6890,7 @@ msgstr ""
 #~ msgstr "Configurar o número de voces distintas desexado en cada pentagrama."
 
 #~ msgid ""
-#~ "This is primarily useful when you write polyphonic music like a fuge."
+#~ "This is primarily useful when you write polyphonic music like a fugue."
 #~ msgstr ""
 #~ "Isto é moi útil sobre todo ao escribir música polifónica como unha fuga."
 

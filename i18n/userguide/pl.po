@@ -7517,7 +7517,7 @@ msgstr ""
 #~ msgstr "Ustal ilość oddzielnych głosów dla każdej pięciolinii. "
 
 #~ msgid ""
-#~ "This is primarily useful when you write polyphonic music like a fuge."
+#~ "This is primarily useful when you write polyphonic music like a fugue."
 #~ msgstr ""
 #~ "Jest to szczególnie użyteczne w pisaniu muzyki polifonicznej, np. fugi."
 

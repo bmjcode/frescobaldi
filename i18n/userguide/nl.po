@@ -9298,7 +9298,7 @@ msgstr ""
 #~ msgstr "Hier kunt u instellen hoeveel aparte stemmen u in elke balk wilt."
 
 #~ msgid ""
-#~ "This is primarily useful when you write polyphonic music like a fuge."
+#~ "This is primarily useful when you write polyphonic music like a fugue."
 #~ msgstr "Dit is vooral handig als u polyfone muziek schrijft zoals een fuga."
 
 #~ msgid "Right hand:"

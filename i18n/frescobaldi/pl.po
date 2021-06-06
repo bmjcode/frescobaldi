@@ -5994,7 +5994,7 @@ msgid "Adjust how many separate voices you want on each staff."
 msgstr "Ustal ilość oddzielnych głosów dla każdej pięciolinii. "
 
 #: ../../frescobaldi_app/scorewiz/parts/_base.py:137
-msgid "This is primarily useful when you write polyphonic music like a fuge."
+msgid "This is primarily useful when you write polyphonic music like a fugue."
 msgstr ""
 "Jest to szczególnie użyteczne w pisaniu muzyki polifonicznej, np. fugi."
 

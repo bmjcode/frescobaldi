@@ -6906,7 +6906,7 @@ msgstr ""
 #~ msgstr "Her dizekte kaç tane ayrı ses istediğinizi ayarlayın."
 
 #~ msgid ""
-#~ "This is primarily useful when you write polyphonic music like a fuge."
+#~ "This is primarily useful when you write polyphonic music like a fugue."
 #~ msgstr ""
 #~ "Bu özellik füg gibi polifonik bir müzik yazıyorsanız birincil derecede "
 #~ "faydalıdır."

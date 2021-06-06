@@ -6006,7 +6006,7 @@ msgid "Adjust how many separate voices you want on each staff."
 msgstr "Nastavit, kolik oddělených hlasů chcete mít na každé notové osnově."
 
 #: ../../frescobaldi_app/scorewiz/parts/_base.py:137
-msgid "This is primarily useful when you write polyphonic music like a fuge."
+msgid "This is primarily useful when you write polyphonic music like a fugue."
 msgstr "Toto je užitečné zejména, když píšete polyfonní hudbu, jakou je fuga."
 
 #: ../../frescobaldi_app/scorewiz/parts/_base.py:139

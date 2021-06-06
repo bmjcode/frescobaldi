@@ -7740,7 +7740,7 @@ msgstr ""
 #~ msgstr "无设置可用。"
 
 #~ msgid ""
-#~ "This is primarily useful when you write polyphonic music like a fuge."
+#~ "This is primarily useful when you write polyphonic music like a fugue."
 #~ msgstr "这主要在你写作复调音乐如赋格时非常有用。"
 
 #~ msgid "Right hand:"

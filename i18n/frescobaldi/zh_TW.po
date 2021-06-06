@@ -5760,7 +5760,7 @@ msgid "Adjust how many separate voices you want on each staff."
 msgstr "調整每個五線譜包含幾個聲部"
 
 #: ../../frescobaldi_app/scorewiz/parts/_base.py:137
-msgid "This is primarily useful when you write polyphonic music like a fuge."
+msgid "This is primarily useful when you write polyphonic music like a fugue."
 msgstr "主要在寫複音音樂時會有用。"
 
 #: ../../frescobaldi_app/scorewiz/parts/_base.py:139
