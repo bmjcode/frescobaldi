@@ -210,11 +210,11 @@ class BassClarinet(WoodWindPart):
 class C_MelodySax(WoodWindPart):
     @staticmethod
     def title(_=_base.translate):
-        return _("C-melody Sax")
+        return _("C-melody saxophone")
 
     @staticmethod
     def short(_=_base.translate):
-        return _("abbreviation for C-melody Sax", "C-Mel Sax")
+        return _("abbreviation for C-melody saxophone", "C-Mel Sax")
 
     midiInstrument = 'soprano sax'
 
@@ -222,11 +222,11 @@ class C_MelodySax(WoodWindPart):
 class SopraninoSax(WoodWindPart):
     @staticmethod
     def title(_=_base.translate):
-        return _("Sopranino Sax")
+        return _("Sopranino saxophone")
 
     @staticmethod
     def short(_=_base.translate):
-        return _("abbreviation for Sopranino Sax", "Si.Sx.")
+        return _("abbreviation for Sopranino saxophone", "Si.Sax.")
 
     midiInstrument = 'soprano sax'
     transposition = (0, 2, -1)    # es'
@@ -235,11 +235,11 @@ class SopraninoSax(WoodWindPart):
 class SopranoSax(WoodWindPart):
     @staticmethod
     def title(_=_base.translate):
-        return _("Soprano Sax")
+        return _("Soprano saxophone")
 
     @staticmethod
     def short(_=_base.translate):
-        return _("abbreviation for Soprano Sax", "So.Sx.")
+        return _("abbreviation for Soprano saxophone", "So.Sax.")
 
     midiInstrument = 'soprano sax'
     transposition = (-1, 6, -1)   # bes
@@ -248,11 +248,11 @@ class SopranoSax(WoodWindPart):
 class AltoSax(WoodWindPart):
     @staticmethod
     def title(_=_base.translate):
-        return _("Alto Sax")
+        return _("Alto saxophone")
 
     @staticmethod
     def short(_=_base.translate):
-        return _("abbreviation for Alto Sax", "A.Sx.")
+        return _("abbreviation for Alto saxophone", "A.Sax.")
 
     midiInstrument = 'alto sax'
     octave = 0
@@ -262,11 +262,11 @@ class AltoSax(WoodWindPart):
 class TenorSax(WoodWindPart):
     @staticmethod
     def title(_=_base.translate):
-        return _("Tenor Sax")
+        return _("Tenor saxophone")
 
     @staticmethod
     def short(_=_base.translate):
-        return _("abbreviation for Tenor Sax", "T.Sx.")
+        return _("abbreviation for Tenor saxophone", "T.Sax.")
 
     midiInstrument = 'tenor sax'
     octave = 0
@@ -276,11 +276,11 @@ class TenorSax(WoodWindPart):
 class BaritoneSax(WoodWindPart):
     @staticmethod
     def title(_=_base.translate):
-        return _("Baritone Sax")
+        return _("Baritone saxophone")
 
     @staticmethod
     def short(_=_base.translate):
-        return _("abbreviation for Baritone Sax", "B.Sx.")
+        return _("abbreviation for Baritone saxophone", "B.Sax.")
 
     midiInstrument = 'baritone sax'
     octave = -1
@@ -290,11 +290,11 @@ class BaritoneSax(WoodWindPart):
 class BassSax(WoodWindPart):
     @staticmethod
     def title(_=_base.translate):
-        return _("Bass Sax")
+        return _("Bass saxophone")
 
     @staticmethod
     def short(_=_base.translate):
-        return _("abbreviation for Bass Sax", "Bs.Sx.")
+        return _("abbreviation for Bass saxophone", "Bs.Sax.")
 
     midiInstrument = 'baritone sax'
     octave = -1
