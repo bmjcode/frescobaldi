@@ -79,6 +79,19 @@ class Base:
 class Part(Base):
     """Base class for Parts (that can't contain other parts)."""
 
+    def _writeTransposed(self, seq):
+        """Alter the written pitch of transposing parts."""
+        toct, tnote, talter = self.transposition
+        # \transposition, which only affects MIDI output, sets the sounding
+        # pitch for written c'. We use it to cancel out the change in sounding
+        # pitch from \transpose, which affects both notation and MIDI output.
+        ly.dom.Pitch(toct, tnote, fractions.Fraction(talter, 2),
+                     ly.dom.Transposition(seq))
+        stub = ly.dom.Command('transpose', seq)
+        ly.dom.Pitch(toct, tnote, fractions.Fraction(talter, 2), stub)
+        ly.dom.Pitch(0, 0, 0, stub)
+        return ly.dom.Seqr(stub)
+
 
 
 class Container(Base):
@@ -109,18 +122,7 @@ class SingleVoicePart(Part):
         if self.clef:
             ly.dom.Clef(self.clef, seq)
         if self.transposition is not None:
-            # Transpose music from concert to written pitch.
-            # Note that \transpose affects both printed and MIDI output,
-            # while \transposition affects only the latter, so we use
-            # \transposition to restore the correct sounding pitch after
-            # \transpose-ing. (Well, technically before, but it's commutative.)
-            toct, tnote, talter = self.transposition
-            # \transposition sets the sounding pitch for written c'
-            ly.dom.Pitch(toct, tnote, fractions.Fraction(talter, 2), ly.dom.Transposition(seq))
-            stub = ly.dom.Command('transpose', seq)
-            ly.dom.Pitch(toct, tnote, fractions.Fraction(talter, 2), stub)
-            ly.dom.Pitch(0, 0, 0, stub)
-            seq = ly.dom.Seqr(stub)
+            seq = self._writeTransposed(seq)
         ly.dom.Identifier(a.name, seq)
         data.nodes.append(staff)
 
@@ -196,12 +198,7 @@ class PianoStaffPart(Part):
         if clef:
             ly.dom.Clef(clef, c)
         if self.transposition is not None:
-            toct, tnote, talter = self.transposition
-            ly.dom.Pitch(toct, tnote, fractions.Fraction(talter, 2), ly.dom.Transposition(c))
-            stub = ly.dom.Command('transpose', c)
-            ly.dom.Pitch(toct, tnote, fractions.Fraction(talter, 2), stub)
-            ly.dom.Pitch(0, 0, 0, stub)
-            c = ly.dom.Seqr(stub)
+            c = self._writeTransposed(c)
         if numVoices == 1:
             a = data.assignMusic(name, octave)
             ly.dom.Identifier(a.name, c)

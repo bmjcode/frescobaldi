@@ -168,12 +168,7 @@ class TablaturePart(_base.Part):
             if self.clef:
                 ly.dom.Clef(self.clef, seq)
             if self.transposition is not None:
-                toct, tnote, talter = self.transposition
-                ly.dom.Pitch(toct, tnote, fractions.Fraction(talter, 2), ly.dom.Transposition(seq))
-                stub = ly.dom.Command('transpose', seq)
-                ly.dom.Pitch(toct, tnote, fractions.Fraction(talter, 2), stub)
-                ly.dom.Pitch(0, 0, 0, stub)
-                seq = ly.dom.Seqr(stub)
+                seq = self._writeTransposed(seq)
             mus = ly.dom.Simr(seq)
             for a in assignments[:-1]:
                 ly.dom.Identifier(a.name, mus)
