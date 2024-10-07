@@ -164,7 +164,7 @@ class TenorHorn(BrassPart):
     def short(_=_base.translate):
         return _("abbreviation for Tenor horn", "T.Hn.")
 
-    midiInstrument = 'trumpet'
+    midiInstrument = 'french horn'
     octave = -1
     transposition = (-1, 2, -1)
 
