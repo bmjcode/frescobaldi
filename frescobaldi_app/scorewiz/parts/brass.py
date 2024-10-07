@@ -155,23 +155,7 @@ class BassTrombone(Trombone):
         return _("abbreviation for Bass trombone", "B.Trb.")
 
 
-class AltoHorn(BrassPart):
-    # American name for tenor horn
-    @staticmethod
-    def title(_=_base.translate):
-        return _("Alto horn")
-
-    @staticmethod
-    def short(_=_base.translate):
-        return _("abbreviation for Alto horn", "A.Hn.")
-
-    midiInstrument = 'trumpet'
-    octave = -1
-    transposition = (-1, 2, -1)
-
-
-class TenorHorn(AltoHorn):
-    # British name for alto horn
+class TenorHorn(BrassPart):
     @staticmethod
     def title(_=_base.translate):
         return _("Tenor horn")
@@ -179,6 +163,10 @@ class TenorHorn(AltoHorn):
     @staticmethod
     def short(_=_base.translate):
         return _("abbreviation for Tenor horn", "T.Hn.")
+
+    midiInstrument = 'trumpet'
+    octave = -1
+    transposition = (-1, 2, -1)
 
 
 class Baritone(BrassPart):
@@ -279,7 +267,6 @@ register(
         TromboneBb,
         AltoTrombone,
         BassTrombone,
-        AltoHorn,
         TenorHorn,
         Baritone,
         Euphonium,
