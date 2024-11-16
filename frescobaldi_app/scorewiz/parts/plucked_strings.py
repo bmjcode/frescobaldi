@@ -22,8 +22,6 @@ Plucked string part types.
 """
 
 
-import fractions
-
 from PyQt6.QtWidgets import (
     QCheckBox, QComboBox, QCompleter, QGridLayout, QHBoxLayout, QLabel,
     QLineEdit, QSpinBox,
