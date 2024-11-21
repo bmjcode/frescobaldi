@@ -339,6 +339,8 @@ class Builder:
             parents = [p for p in partData if not p.isChild]
             makeRecursive(parents, music)
             if self.midi and self.separateMidi:
+                if not self.showMetronomeMark:
+                    self.midiParts.append(scoreProperties.lySimpleMidiTempo(None))
                 self.midiParts.append(music.copy())
 
             # add the prefix to the assignments if necessary
