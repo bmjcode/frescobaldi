@@ -222,11 +222,28 @@ class Builder:
         else:
             groups = globalGroup.groups
 
+        if self.midi and self.separateMidi:
+            # collect MIDI parts here when placing them in a separate \score
+            self.midiParts = []
+
         self.blocks = []
         for group in groups:
             block = BlockData()
             self.makeBlock(group, block.scores, block)
             self.blocks.append(block)
+
+        if self.midi and self.separateMidi and self.midiParts:
+            # create a separate \score for MIDI output
+            ly.dom.BlankLine(block.scores)
+            score = ly.dom.Score(block.scores)
+            midi = ly.dom.Midi(score)
+            if len(self.midiParts) == 1:
+                score.insert(0, self.midiParts[0])
+            else:
+                music = ly.dom.Seq()
+                for part in self.midiParts:
+                    music.append(part)
+                score.insert(0, music)
 
     def makeBlock(self, group, node, block):
         """Recursively populates the Block with data from the group.
@@ -256,7 +273,10 @@ class Builder:
             if globalName == 'global':
                 self.globalUsed = True
 
-            def addMidi(score):
+            # add parts here, always in \score { }
+            score = node if isinstance(node, ly.dom.Score) else ly.dom.Score(node)
+            ly.dom.Layout(score)
+            if self.midi and not self.separateMidi:
                 midi = ly.dom.Midi(score)
                 # set MIDI tempo if necessary
                 if not self.showMetronomeMark:
@@ -265,15 +285,6 @@ class Builder:
                         midi[0].after = 1
                     else:
                         scoreProperties.lyMidiTempo(ly.dom.Context('Score', midi))
-
-            # was this node created by containers.Score?
-            nodeIsScore = isinstance(node, ly.dom.Score)
-
-            # add parts here, always in \score { }
-            score = node if nodeIsScore else ly.dom.Score(node)
-            ly.dom.Layout(score)
-            if self.midi and (nodeIsScore or not self.separateMidi):
-                addMidi(score)
             music = ly.dom.Simr()
             score.insert(0, music)
 
@@ -327,18 +338,13 @@ class Builder:
 
             parents = [p for p in partData if not p.isChild]
             makeRecursive(parents, music)
+            if self.midi and self.separateMidi:
+                self.midiParts.append(music.copy())
 
             # add the prefix to the assignments if necessary
             if self.usePrefix:
                 for a in assignments:
                     a.name.name = ly.util.mkid(prefix, a.name.name)
-
-            # add a separate \score { } for MIDI if requested
-            if self.midi and self.separateMidi and not nodeIsScore:
-                ly.dom.BlankLine(node)
-                score = ly.dom.Score(node)
-                addMidi(score)
-                score.insert(0, music.copy())
 
         for g in group.groups:
             self.makeBlock(g, node, block)
