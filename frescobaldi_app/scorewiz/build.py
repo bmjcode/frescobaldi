@@ -155,13 +155,15 @@ class Builder:
         generalPreferences = dialog.settings.widget().generalPreferences
         lilyPondPreferences = dialog.settings.widget().lilyPondPreferences
         instrumentNames = dialog.settings.widget().instrumentNames
+        midiOutput = dialog.settings.widget().midiOutput
 
         # attributes the Part and Container types may read and we need later as well
         self.header = list(dialog.header.widget().headers())
         self.headerDict = dict(self.header)
         self.lyVersionString = lilyPondPreferences.version.currentText().strip()
         self.lyVersion = tuple(map(int, re.findall('\\d+', self.lyVersionString)))
-        self.midi = generalPreferences.midi.isChecked()
+        self.midi = midiOutput.isChecked()
+        self.separateMidi = midiOutput.separateScore.isChecked()
         self.pitchLanguage = dialog.pitchLanguage()
         self.suppressTagLine = generalPreferences.tagl.isChecked()
         self.removeBarNumbers = generalPreferences.barnum.isChecked()
@@ -254,10 +256,7 @@ class Builder:
             if globalName == 'global':
                 self.globalUsed = True
 
-            # add parts here, always in \score { }
-            score = node if isinstance(node,ly.dom.Score) else ly.dom.Score(node)
-            ly.dom.Layout(score)
-            if self.midi:
+            def addMidi(score):
                 midi = ly.dom.Midi(score)
                 # set MIDI tempo if necessary
                 if not self.showMetronomeMark:
@@ -266,6 +265,15 @@ class Builder:
                         midi[0].after = 1
                     else:
                         scoreProperties.lyMidiTempo(ly.dom.Context('Score', midi))
+
+            # was this node created by containers.Score?
+            nodeIsScore = isinstance(node, ly.dom.Score)
+
+            # add parts here, always in \score { }
+            score = node if nodeIsScore else ly.dom.Score(node)
+            ly.dom.Layout(score)
+            if self.midi and (nodeIsScore or not self.separateMidi):
+                addMidi(score)
             music = ly.dom.Simr()
             score.insert(0, music)
 
@@ -324,6 +332,13 @@ class Builder:
             if self.usePrefix:
                 for a in assignments:
                     a.name.name = ly.util.mkid(prefix, a.name.name)
+
+            # add a separate \score { } for MIDI if requested
+            if self.midi and self.separateMidi and not nodeIsScore:
+                ly.dom.BlankLine(node)
+                score = ly.dom.Score(node)
+                addMidi(score)
+                score.insert(0, music.copy())
 
         for g in group.groups:
             self.makeBlock(g, node, block)
