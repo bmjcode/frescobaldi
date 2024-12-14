@@ -30,6 +30,7 @@ from PyQt6.QtGui import QTextCursor
 import app
 import textformats
 import widgets.completer
+import worker
 
 
 class Completer(widgets.completer.Completer):
@@ -44,6 +45,7 @@ class Completer(widgets.completer.Completer):
         self.popupRequested.connect(self._worker.slotPrepareCompletionCursor)
         self._worker.haveCompletionCursor.connect(self.slotShowCompletionPopup)
         self._worker.moveToThread(app.worker_thread())
+        app.worker_thread().finished.connect(self._worker.deleteLater)
 
     def readSettings(self):
         self.popup().setFont(textformats.formatData('editor').font)
@@ -58,14 +60,10 @@ class Completer(widgets.completer.Completer):
     popupRequested = pyqtSignal('PyQt_PyObject', bool)
 
 
-class CompleterWorker(QObject):
+class CompleterWorker(worker.Worker):
     """Worker to create a completion model in a background thread."""
-    def __init__(self, plugin):
-        super().__init__()  # no parent
-        self._plugin = plugin
-
     def slotPrepareCompletionCursor(self, cursor, forced):
-        plugin = self._plugin
+        plugin = self.parent()
         # trick: if we are still visible we don't have to analyze the text again
         if not (plugin.popup().isVisible() and self._pos < cursor.position()):
             analyzer = self.analyzer()

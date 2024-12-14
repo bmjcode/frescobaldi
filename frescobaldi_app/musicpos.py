@@ -30,12 +30,14 @@ import weakref
 import app
 import plugin
 import cursortools
+import worker
 
 
 class MusicPosition(plugin.ViewSpacePlugin):
     def __init__(self, space):
         self._worker = MusicPositionWorker(self)
         self._worker.moveToThread(app.worker_thread())
+        app.worker_thread().finished.connect(self._worker.deleteLater)
         self._timer = QTimer(singleShot=True,
                              timeout=self._worker.slotTimeout)
         self._waittimer = QTimer(singleShot=True,
@@ -75,15 +77,12 @@ class MusicPosition(plugin.ViewSpacePlugin):
             self._timer.start(100)
 
 
-class MusicPositionWorker(QObject):
+class MusicPositionWorker(worker.Worker):
     """Worker to update the music position in a background thread."""
-    def __init__(self, plugin):
-        super().__init__()  # no parent
-        self._plugin = plugin
-
     def slotTimeout(self):
         """Called when one of the timers in the main thread fires."""
-        view = self._plugin._view()
+        plugin = self.parent()
+        view = plugin._view()
         if view:
             d = view.document()
             c = view.textCursor()
@@ -99,7 +98,7 @@ class MusicPositionWorker(QObject):
                 pos = m.time_position(c.position())
                 text = _("Pos: {pos}").format(
                     pos=ly.duration.format_fraction(pos)) if pos is not None else ''
-            label = self._plugin._label
+            label = plugin._label
             label.setText(text)
             label.setVisible(bool(text))
 
