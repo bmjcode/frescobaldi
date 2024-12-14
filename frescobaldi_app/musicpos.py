@@ -35,9 +35,7 @@ import worker
 
 class MusicPosition(plugin.ViewSpacePlugin):
     def __init__(self, space):
-        self._worker = MusicPositionWorker(self)
-        self._worker.moveToThread(app.worker_thread())
-        app.worker_thread().finished.connect(self._worker.deleteLater)
+        self._worker = MusicPositionWorker.create(self)
         self._timer = QTimer(singleShot=True,
                              timeout=self._worker.slotTimeout)
         self._waittimer = QTimer(singleShot=True,
@@ -81,7 +79,7 @@ class MusicPositionWorker(worker.Worker):
     """Worker to update the music position in a background thread."""
     def slotTimeout(self):
         """Called when one of the timers in the main thread fires."""
-        plugin = self.parent()
+        plugin = self.controller()
         view = plugin._view()
         if view:
             d = view.document()

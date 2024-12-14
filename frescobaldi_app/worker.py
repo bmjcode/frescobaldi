@@ -18,13 +18,15 @@
 # See http://www.gnu.org/licenses/ for more information.
 
 """
-Base class for worker objects.
+Simple API for creating worker objects.
 
 A Worker is used to run slow operations in a background thread, which
-is normally app.worker_thread(). Subclass it to define slots to perform
-work and signals to communicate with its parent.
+is normally app.worker_thread(). Subclass Worker to implement your logic,
+then call your subclass's create() method to instantiate it.
 
-A Worker keeps a weak reference to its parent in its parent attribute.
+A Worker does not have a parent QObject, but does keep a weak reference
+to its controller in its controller attribute. The controller does not
+need to be derived from QObject.
 
 """
 
@@ -32,10 +34,32 @@ import weakref
 
 from PyQt6.QtCore import QObject
 
+import app
+
 
 class Worker(QObject):
-    """Base class for worker objects."""
-    def __init__(self, parent):
+    """Base class for worker objects.
+
+    Subclass this to define slots to perform work and signals to
+    communicate with its controller.
+
+    Create workers using your subclass's create() class method.
+
+    """
+    def __init__(self, controller):
         super().__init__()  # we can't move this to another thread if we
                             # construct the underlying QObject with a parent
-        self.parent = weakref.ref(parent)
+        self.controller = weakref.ref(controller)
+
+    @classmethod
+    def create(cls, controller):
+        """Create a worker object with the specified controller.
+
+        The worker is moved to the global worker thread and scheduled
+        for deletion when that thread exits.
+
+        """
+        worker = cls(controller)
+        worker.moveToThread(app.worker_thread())
+        app.worker_thread().finished.connect(worker.deleteLater)
+        return worker
