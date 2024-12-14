@@ -305,7 +305,6 @@ def worker_thread():
     if _worker_thread is None:
         from PyQt6.QtCore import QThread
         _worker_thread = QThread()
-        _worker_thread.finished.connect(_worker_thread.deleteLater)
         _worker_thread.start()
     return _worker_thread
 
