@@ -24,6 +24,7 @@ The completer for Frescobaldi.
 
 import re
 
+from PyQt6.QtCore import QMutex, QObject, QThread, pyqtSignal
 from PyQt6.QtGui import QTextCursor
 
 import app
@@ -39,26 +40,63 @@ class Completer(widgets.completer.Completer):
         app.settingsChanged.connect(self.readSettings)
         self.readSettings()
 
+        self._mutex = QMutex()
+        self._workerThread = QThread()
+        self._workerThread.finished.connect(self._workerThread.deleteLater)
+        self._worker = CompleterWorker(self)
+        self.popupRequested.connect(self._worker.slotPrepareCompletionCursor)
+        self._worker.haveCompletionCursor.connect(self.slotShowCompletionPopup)
+        self._worker.moveToThread(self._workerThread)
+        self._workerThread.start()
+
+    def __del__(self):
+        self._workerThread.quit()
+        self._workerThread.wait()
+
     def readSettings(self):
         self.popup().setFont(textformats.formatData('editor').font)
         self.popup().setPalette(textformats.formatData('editor').palette())
 
     def completionCursor(self):
-        cursor = self.textCursor()
-        # trick: if we are still visible we don't have to analyze the text again
-        if not (self.popup().isVisible() and self._pos < cursor.position()):
-            analyzer = self.analyzer()
-            pos, model = analyzer.completions(cursor)
-            if not model:
-                return
-            self._pos = cursor.block().position() + pos
-            if self.model() != model:
-                self.setModel(model)
-        cursor.setPosition(self._pos, QTextCursor.MoveMode.KeepAnchor)
-        return cursor
+        pass
+
+    def showCompletionPopup(self, forced=True):
+        self.popupRequested.emit(self.textCursor(), forced)
+
+    def mutex(self):
+        return self._mutex
+
+    popupRequested = pyqtSignal('PyQt_PyObject', bool)
+
+
+class CompleterWorker(QObject):
+    """Worker to create a completion model in a background thread."""
+    def __init__(self, plugin):
+        super().__init__()  # no parent
+        self._plugin = plugin
+
+    def slotPrepareCompletionCursor(self, cursor, forced):
+        plugin = self._plugin
+        try:
+            plugin.mutex().lock()
+            # trick: if we are still visible we don't have to analyze the text again
+            if not (plugin.popup().isVisible() and self._pos < cursor.position()):
+                analyzer = self.analyzer()
+                pos, model = analyzer.completions(cursor)
+                if not model:
+                    return
+                self._pos = cursor.block().position() + pos
+                if plugin.model() != model:
+                    plugin.setModel(model)
+            cursor.setPosition(self._pos, QTextCursor.MoveMode.KeepAnchor)
+            self.haveCompletionCursor.emit(cursor, forced)
+        finally:
+            plugin.mutex().unlock()
 
     def analyzer(self):
         from . import analyzer
         return analyzer.Analyzer()
+
+    haveCompletionCursor = pyqtSignal('PyQt_PyObject', bool)
 
 

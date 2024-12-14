@@ -172,8 +172,17 @@ class Completer(QCompleter):
         True and the cursor returned by completionCursor() has at least
         self.autoCompleteLength characters selected.
 
+        To create a completion model in a background thread, override this
+        function so that it creates a worker object to prepare the
+        completion cursor, and have your worker emit a signal connected to
+        slotShowCompletionPopup() when the cursor is ready.
+
         """
         cursor = self.completionCursor()
+        self.slotShowCompletionPopup(cursor, forced)
+
+    def slotShowCompletionPopup(self, cursor, forced):
+        """Called to display the completion popup when the cursor is ready."""
         if not cursor:
             self.popup().hide()
             return
