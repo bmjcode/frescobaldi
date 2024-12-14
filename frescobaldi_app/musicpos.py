@@ -34,8 +34,12 @@ import cursortools
 
 class MusicPosition(plugin.ViewSpacePlugin):
     def __init__(self, space):
-        self._timer = QTimer(singleShot=True, timeout=self.slotTimeout)
-        self._waittimer = QTimer(singleShot=True, timeout=self.slotTimeout)
+        self._worker = MusicPositionWorker(self)
+        self._worker.moveToThread(app.worker_thread())
+        self._timer = QTimer(singleShot=True,
+                             timeout=self._worker.slotTimeout)
+        self._waittimer = QTimer(singleShot=True,
+                                 timeout=self._worker.slotTimeout)
         self._label = QLabel()
         space.status.layout().insertWidget(1, self._label)
         self._view = lambda: None
@@ -43,10 +47,6 @@ class MusicPosition(plugin.ViewSpacePlugin):
         view = space.activeView()
         if view:
             self.slotViewChanged(view)
-        # Updating this can be a slow operation if we need to rebuild the
-        # ly.music tree, so we do the heavy lifting in a separate thread
-        self._worker = MusicPositionWorker(self)
-        self._worker.moveToThread(app.worker_thread())
 
     def slotViewChanged(self, view):
         old = self._view()
@@ -73,10 +73,6 @@ class MusicPosition(plugin.ViewSpacePlugin):
         """Called when the cursor moves."""
         if not self._waittimer.isActive():
             self._timer.start(100)
-
-    def slotTimeout(self):
-        # Doing this is safer than connecting directly to the worker's slot
-        QTimer.singleShot(0, self._worker.slotTimeout)
 
 
 class MusicPositionWorker(QObject):
