@@ -22,7 +22,7 @@ Shows the time position of the text cursor in the music.
 """
 
 
-from PyQt6.QtCore import QObject, QThread, QTimer
+from PyQt6.QtCore import QObject, QTimer
 from PyQt6.QtWidgets import QLabel
 
 import weakref
@@ -45,15 +45,8 @@ class MusicPosition(plugin.ViewSpacePlugin):
             self.slotViewChanged(view)
         # Updating this can be a slow operation if we need to rebuild the
         # ly.music tree, so we do the heavy lifting in a separate thread
-        self._workerThread = QThread()
-        self._workerThread.finished.connect(self._workerThread.deleteLater)
         self._worker = MusicPositionWorker(self)
-        self._worker.moveToThread(self._workerThread)
-        self._workerThread.start()
-
-    def __del__(self):
-        self._workerThread.quit()
-        self._workerThread.wait()
+        self._worker.moveToThread(app.worker_thread())
 
     def slotViewChanged(self, view):
         old = self._view()

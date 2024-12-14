@@ -24,7 +24,7 @@ The completer for Frescobaldi.
 
 import re
 
-from PyQt6.QtCore import QMutex, QObject, QThread, pyqtSignal
+from PyQt6.QtCore import QMutex, QObject, pyqtSignal
 from PyQt6.QtGui import QTextCursor
 
 import app
@@ -41,17 +41,10 @@ class Completer(widgets.completer.Completer):
         self.readSettings()
 
         self._mutex = QMutex()
-        self._workerThread = QThread()
-        self._workerThread.finished.connect(self._workerThread.deleteLater)
         self._worker = CompleterWorker(self)
         self.popupRequested.connect(self._worker.slotPrepareCompletionCursor)
         self._worker.haveCompletionCursor.connect(self.slotShowCompletionPopup)
-        self._worker.moveToThread(self._workerThread)
-        self._workerThread.start()
-
-    def __del__(self):
-        self._workerThread.quit()
-        self._workerThread.wait()
+        self._worker.moveToThread(app.worker_thread())
 
     def readSettings(self):
         self.popup().setFont(textformats.formatData('editor').font)
