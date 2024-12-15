@@ -32,7 +32,7 @@ need to be derived from QObject.
 
 import weakref
 
-from PyQt6.QtCore import QObject
+from PyQt6.QtCore import QObject, QMutex
 
 import app
 
@@ -50,6 +50,22 @@ class Worker(QObject):
         super().__init__()  # we can't move this to another thread if we
                             # construct the underlying QObject with a parent
         self.controller = weakref.ref(controller)
+        self._mutex = None
+
+    def mutex(self):
+        """Return a QMutex for this Worker.
+
+        Use this if you need to manage the Worker's state from another
+        thread. In general it's better to pass data to the Worker using
+        slot parameters, but this isn't possible in some cases, like
+        when triggering it from a QTimer.
+
+        The QMutex is created the first time this method is called.
+
+        """
+        if self._mutex is None:
+            self._mutex = QMutex()
+        return self._mutex
 
     @classmethod
     def create(cls, controller):
