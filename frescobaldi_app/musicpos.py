@@ -36,7 +36,7 @@ import worker
 class MusicPosition(plugin.ViewSpacePlugin):
     def __init__(self, space):
         self._worker = MusicPositionWorker.create(self)
-        self._worker.textChanged.connect(self._slotDisplayText)
+        self._worker.textChanged.connect(self.slotDisplayText)
         self._timer = QTimer(singleShot=True, timeout=self.slotTimeout)
         self._waittimer = QTimer(singleShot=True, timeout=self.slotTimeout)
         self._label = QLabel()
@@ -78,9 +78,10 @@ class MusicPosition(plugin.ViewSpacePlugin):
         view = self._view()
         if view:
             self._worker.prepare(view.document(), view.textCursor())
-            QTimer.singleShot(0, self._worker.slotTimeout)
+            QTimer.singleShot(0, self._worker.slotWork)
 
-    def _slotDisplayText(self, text):
+    def slotDisplayText(self, text):
+        """Called from the worker to display the updated position."""
         self._label.setText(text)
         self._label.setVisible(bool(text))
 
@@ -102,8 +103,8 @@ class MusicPositionWorker(worker.Worker):
         finally:
             self.mutex().unlock()
 
-    def slotTimeout(self):
-        """Called when one of the timers in the main thread fires."""
+    def slotWork(self):
+        """Called from the main thread to recalculate the music position."""
         try:
             self.mutex().lock()
             d = self._document
