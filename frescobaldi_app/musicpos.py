@@ -22,7 +22,7 @@ Shows the time position of the text cursor in the music.
 """
 
 
-from PyQt6.QtCore import QTimer
+from PyQt6.QtCore import QTimer, pyqtSignal
 from PyQt6.QtWidgets import QLabel
 
 import weakref
@@ -36,6 +36,7 @@ import worker
 class MusicPosition(plugin.ViewSpacePlugin):
     def __init__(self, space):
         self._worker = MusicPositionWorker.create(self)
+        self._worker.textChanged.connect(self._slotDisplayText)
         self._timer = QTimer(singleShot=True,
                              timeout=self._worker.slotTimeout)
         self._waittimer = QTimer(singleShot=True,
@@ -74,6 +75,10 @@ class MusicPosition(plugin.ViewSpacePlugin):
         if not self._waittimer.isActive():
             self._timer.start(100)
 
+    def _slotDisplayText(self, text):
+        self._label.setText(text)
+        self._label.setVisible(bool(text))
+
 
 class MusicPositionWorker(worker.Worker):
     """Worker to update the music position in a background thread.
@@ -102,8 +107,10 @@ class MusicPositionWorker(worker.Worker):
                 pos = m.time_position(c.position())
                 text = _("Pos: {pos}").format(
                     pos=ly.duration.format_fraction(pos)) if pos is not None else ''
-            plugin._label.setText(text)
-            plugin._label.setVisible(bool(text))
+            self.textChanged.emit(text)
+
+    # argument: text
+    textChanged = pyqtSignal(str)
 
 
 app.viewSpaceCreated.connect(MusicPosition.instance)
