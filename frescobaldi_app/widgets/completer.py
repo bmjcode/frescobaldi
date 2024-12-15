@@ -22,9 +22,11 @@ Completer providing completions in a Q(Plain)TextEdit.
 """
 
 
-from PyQt6.QtCore import QEvent, QModelIndex, Qt
+from PyQt6.QtCore import QEvent, QModelIndex, Qt, pyqtSignal
 from PyQt6.QtGui import QKeySequence, QTextCursor
 from PyQt6.QtWidgets import QCompleter, QApplication
+
+import worker
 
 
 class Completer(QCompleter):
@@ -33,7 +35,9 @@ class Completer(QCompleter):
     Use setWidget() to assign the completer to a text edit.
 
     You can reimplement completionCursor() to make your own, other than simple
-    string-based completions.
+    string-based completions. Alternatively, you can subclass CompleterWorker
+    and assign an instance using setWorker() to build the completion model in
+    a background thread.
 
     Call showCompletionPopup() to force the popup to show.
 
@@ -45,6 +49,7 @@ class Completer(QCompleter):
         super().__init__(*args, **kwargs)
         self.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
         self.activated[QModelIndex].connect(self.insertCompletion)
+        self._worker = None
 
     def eventFilter(self, obj, ev):
         if ev.type() != QEvent.Type.KeyPress:
@@ -154,8 +159,13 @@ class Completer(QCompleter):
 
         This method may also alter the completion model.
 
+        If you assign a CompletionWorker using setWorker(), you should do
+        whatever you would do here in its run() method instead.
+
         """
         cursor = self.textCursor()
+        if self._worker:
+            return cursor
         if cursor.hasSelection():
             cursor.setPosition(cursor.selectionEnd())
         cursor.movePosition(QTextCursor.MoveOperation.StartOfWord, QTextCursor.MoveMode.KeepAnchor)
@@ -174,6 +184,12 @@ class Completer(QCompleter):
 
         """
         cursor = self.completionCursor()
+        if self._worker:
+            self._startWorker.emit(cursor, forced)
+        else:
+            self._showCompletionPopup(cursor, forced)
+
+    def _showCompletionPopup(self, cursor, forced):
         if not cursor:
             self.popup().hide()
             return
@@ -270,3 +286,54 @@ class Completer(QCompleter):
         self.setCurrentRow((self.currentIndex().row() + direction) %
                            self.completionCount())
         self.popup().setCurrentIndex(self.currentIndex())
+
+    def setWorker(self, worker):
+        """Assigns a CompleterWorker to this Completer.
+
+        This allows building a completion model in a background thread.
+
+        """
+        if worker:
+            self._startWorker.connect(worker._start)
+            worker._finished.connect(self._showCompletionPopup)
+        elif self._worker:
+            # Disconnect signals to and from the old worker
+            self._startWorker.disconnect(self._worker._start)
+            self._worker._finished.disconnect(self._showCompletionPopup)
+        self._worker = worker
+
+    # arguments: cursor, forced
+    _startWorker = pyqtSignal('PyQt_PyObject', bool)
+
+
+class CompleterWorker(worker.Worker):
+    """Worker to prepare for completion in a background thread.
+
+    Subclass this and implement run() to position the completion cursor
+    and/or alter the completion model.
+
+    """
+    def run(self):
+        """Override this to implement your worker's logic."""
+        pass
+
+    def cursor(self):
+        """Returns the completion cursor or None."""
+        return self._cursor
+
+    def model(self):
+        """Returns the Completer's model."""
+        return self.controller().model()
+
+    def setModel(self, model):
+        """Replaces the Completer's model."""
+        model.moveToThread(self.controller().thread())
+        self.controller().setModel(model)
+
+    def _start(self, cursor, forced):
+        self._cursor = cursor
+        self.run()
+        self._finished.emit(self._cursor, forced)
+
+    # arguments: cursor, forced
+    _finished = pyqtSignal('PyQt_PyObject', bool)
