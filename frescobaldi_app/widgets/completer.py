@@ -185,7 +185,7 @@ class Completer(QCompleter):
         """
         cursor = self.completionCursor()
         if self._worker:
-            self._startWorker.emit(cursor, forced)
+            self._startWorker.emit(cursor, forced, self.popup().isVisible())
         else:
             self._showCompletionPopup(cursor, forced)
 
@@ -302,8 +302,8 @@ class Completer(QCompleter):
             self._worker._finished.disconnect(self._showCompletionPopup)
         self._worker = worker
 
-    # arguments: cursor, forced
-    _startWorker = pyqtSignal('PyQt_PyObject', bool)
+    # arguments: cursor, forced, popupVisible
+    _startWorker = pyqtSignal('PyQt_PyObject', bool, bool)
 
 
 class CompleterWorker(worker.Worker):
@@ -330,8 +330,13 @@ class CompleterWorker(worker.Worker):
         model.moveToThread(self.controller().thread())
         self.controller().setModel(model)
 
-    def _start(self, cursor, forced):
+    def popupVisible(self):
+        """Returns whether the Completer's popup is visible."""
+        return self._popupVisible
+
+    def _start(self, cursor, forced, popupVisible):
         self._cursor = cursor
+        self._popupVisible = popupVisible
         self.run()
         self._finished.emit(self._cursor, forced)
 

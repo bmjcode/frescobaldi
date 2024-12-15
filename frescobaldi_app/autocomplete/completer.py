@@ -48,10 +48,9 @@ class Completer(widgets.completer.Completer):
 class CompleterWorker(widgets.completer.CompleterWorker):
     """Worker to build a completion model in a background thread."""
     def run(self):
-        plugin = self.controller()
         cursor = self.cursor()
         # trick: if we are still visible we don't have to analyze the text again
-        if not (plugin.popup().isVisible() and self._pos < cursor.position()):
+        if not (self.popupVisible() and self._pos < cursor.position()):
             analyzer = self.analyzer()
             pos, model = analyzer.completions(cursor)
             if not model:
