@@ -30,12 +30,16 @@ import weakref
 import app
 import plugin
 import cursortools
+import worker
 
 
 class MusicPosition(plugin.ViewSpacePlugin):
     def __init__(self, space):
-        self._timer = QTimer(singleShot=True, timeout=self.slotTimeout)
-        self._waittimer = QTimer(singleShot=True, timeout=self.slotTimeout)
+        self._worker = MusicPositionWorker.create(self)
+        self._timer = QTimer(singleShot=True,
+                             timeout=self._worker.slotTimeout)
+        self._waittimer = QTimer(singleShot=True,
+                                 timeout=self._worker.slotTimeout)
         self._label = QLabel()
         space.status.layout().insertWidget(1, self._label)
         self._view = lambda: None
@@ -70,9 +74,19 @@ class MusicPosition(plugin.ViewSpacePlugin):
         if not self._waittimer.isActive():
             self._timer.start(100)
 
+
+class MusicPositionWorker(worker.Worker):
+    """Worker to update the music position in a background thread.
+
+    If the document has changed, calculating this requires rebuilding
+    its ly.music tree (a slow operation). Running it in the background
+    thus reduces lag when editing larger files.
+
+    """
     def slotTimeout(self):
-        """Called when one of the timers fires."""
-        view = self._view()
+        """Called when one of the timers in the main thread fires."""
+        plugin = self.controller()
+        view = plugin._view()
         if view:
             d = view.document()
             c = view.textCursor()
@@ -88,8 +102,8 @@ class MusicPosition(plugin.ViewSpacePlugin):
                 pos = m.time_position(c.position())
                 text = _("Pos: {pos}").format(
                     pos=ly.duration.format_fraction(pos)) if pos is not None else ''
-            self._label.setText(text)
-            self._label.setVisible(bool(text))
+            plugin._label.setText(text)
+            plugin._label.setVisible(bool(text))
 
 
 app.viewSpaceCreated.connect(MusicPosition.instance)
